@@ -1,0 +1,23 @@
+# OP 环境配置
+# 支持环境变量替换：${ENV_VAR} 或 ${ENV_VAR:default_value}
+
+# API 网关配置
+api:
+  base_url: https://bkapi.bkop.woa.com/api/bk-monitor/prod/app
+  timeout: 30
+  retry_count: 3
+  retry_interval: 1
+
+# 认证配置
+auth:
+  app_code: ${BK_APP_CODE:}
+  app_secret: ${BK_APP_SECRET:}
+
+# 业务配置
+biz:
+  bk_biz_id: 2
+
+# 日志配置
+logging:
+  level: INFO
+  verbose: false

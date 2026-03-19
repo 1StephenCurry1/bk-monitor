@@ -1,0 +1,9 @@
+# 环境变量文件（包含敏感认证信息）
+.env
+.env.*
+!.env.example
+
+# pytest 缓存
+.pytest_cache/
+__pycache__/
+*.pyc

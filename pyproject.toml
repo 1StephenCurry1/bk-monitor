@@ -59,5 +59,11 @@ extend-safe-fixes = ["UP"]
 [tool.ruff.format]
 docstring-code-format = true
 
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "jsonpath-ng>=1.6.0",
+]
+
 [tool.ruff.lint.extend-per-file-ignores]
 "bkmonitor/config/**" = ["F405"]
