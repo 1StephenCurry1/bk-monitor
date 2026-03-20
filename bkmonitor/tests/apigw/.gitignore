@@ -7,3 +7,5 @@
 .pytest_cache/
 __pycache__/
 *.pyc
+/alarm_strategy_api_responses_*.json
+/inspect_alarm_strategy_api.py

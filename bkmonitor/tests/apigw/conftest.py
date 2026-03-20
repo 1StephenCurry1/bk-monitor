@@ -26,7 +26,9 @@ _env_path = Path(__file__).parent / ".env"
 if _env_path.exists():
     load_dotenv(_env_path)
 
+from tests.apigw.clients.alarm_strategy import AlarmStrategyClient
 from tests.apigw.clients.uptime_check import UptimeCheckClient
+from tests.apigw.models.alarm_strategy import AlarmStrategyDelete
 from tests.apigw.utils.config_loader import (
     Settings,
     get_current_environment,
@@ -70,6 +72,12 @@ def bk_biz_id(settings: Settings) -> int:
 def uptime_check_client(settings: Settings) -> UptimeCheckClient:
     """创建拨测客户端（session 级别，整个测试会话复用）"""
     return UptimeCheckClient(settings)
+
+
+@pytest.fixture(scope="session")
+def alarm_strategy_client(settings: Settings) -> AlarmStrategyClient:
+    """创建告警策略客户端（session 级别，整个测试会话复用）"""
+    return AlarmStrategyClient(settings)
 
 
 # ============== 状态存储 fixtures（用于 CRUD 顺序保证） ==============
@@ -364,6 +372,62 @@ def func_resource_cleaner(
     用于单个测试函数内的资源清理
     """
     cleaner = ResourceCleaner(uptime_check_client, bk_biz_id)
+    yield cleaner
+    cleaner.cleanup()
+
+
+# ============== 告警策略清理器 ==============
+
+
+class StrategyCleaner:
+    """告警策略清理器，统一管理测试策略的注册与清理"""
+
+    def __init__(self, client: AlarmStrategyClient, bk_biz_id: int) -> None:
+        self.client = client
+        self.bk_biz_id = bk_biz_id
+        self._strategies: list[int] = []
+
+    def register(self, strategy_id: int) -> None:
+        """注册待清理的策略"""
+        self._strategies.append(strategy_id)
+
+    def cleanup(self) -> None:
+        """执行清理"""
+        for strategy_id in self._strategies:
+            try:
+                request = AlarmStrategyDelete(bk_biz_id=self.bk_biz_id, ids=[strategy_id])
+                self.client.delete(request)
+                logger.info(f"已清理策略: {strategy_id}")
+            except Exception as e:
+                logger.warning(f"清理策略 {strategy_id} 失败: {e}")
+
+
+@pytest.fixture(scope="module")
+def strategy_cleaner(
+    alarm_strategy_client: AlarmStrategyClient,
+    bk_biz_id: int,
+) -> Generator[StrategyCleaner, None, None]:
+    """
+    模块级别策略清理器
+    """
+    cleaner = StrategyCleaner(alarm_strategy_client, bk_biz_id)
+    yield cleaner
+    logger.info("开始清理测试策略...")
+    cleaner.cleanup()
+    logger.info("策略清理完成")
+
+
+@pytest.fixture(scope="function")
+def func_strategy_cleaner(
+    alarm_strategy_client: AlarmStrategyClient,
+    bk_biz_id: int,
+) -> Generator[StrategyCleaner, None, None]:
+    """
+    函数级别策略清理器
+
+    用于单个测试函数内的策略清理
+    """
+    cleaner = StrategyCleaner(alarm_strategy_client, bk_biz_id)
     yield cleaner
     cleaner.cleanup()
 

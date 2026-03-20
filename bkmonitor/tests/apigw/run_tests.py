@@ -210,7 +210,10 @@ def run_tests(environment: str, pytest_args: list[str]) -> int:
         i += 1
 
     # 构建 pytest 命令
-    cmd = [sys.executable, "-m", "pytest"]
+    # 使用 uv run 确保在正确的虚拟环境中运行
+    # --directory 指定项目根目录（bk-monitor）以使用正确的 pyproject.toml 和 .venv
+    project_root = apigw_dir.parent.parent.parent  # tests -> bkmonitor -> bk-monitor
+    cmd = ["uv", "run", "--directory", str(project_root), "python", "-m", "pytest"]
 
     # 如果没有指定测试路径，默认运行整个 tests 目录
     if not has_test_path:
