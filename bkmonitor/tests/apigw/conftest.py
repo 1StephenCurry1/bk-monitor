@@ -134,8 +134,7 @@ def node_test_data(uptime_check_test_data: dict[str, Any]) -> dict[str, Any]:
         "name": "test_node_auto",
         "bk_host_id": node_config["bk_host_id"],
         "ip": node_config["ip"],
-        "plat_id": node_config["plat_id"],
-        "bk_cloud_id": node_config["plat_id"],  # 兼容字段名
+        "bk_cloud_id": node_config["bk_cloud_id"],
         "is_common": False,
         "location": {"country": "中国", "city": "深圳"},
         "carrieroperator": "内网",

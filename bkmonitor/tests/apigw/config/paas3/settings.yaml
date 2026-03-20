@@ -10,8 +10,8 @@ api:
 
 # 认证配置
 auth:
-  app_code: ${BK_APP_CODE_OP:}
-  app_secret: ${BK_APP_SECRET_OP:}
+  app_code: ${BK_APP_CODE_PAAS3:}
+  app_secret: ${BK_APP_SECRET_PAAS3:}
 
 # 业务配置
 biz:
