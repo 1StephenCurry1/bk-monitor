@@ -159,7 +159,7 @@ $(function () {
     function requestCallback (request) {
       // Fill in the "GET /foo/" display.
       var parser = document.createElement('a')
-      parser.href = request.url
+      // parser.href = request.url
       var method = request.options.method
       var path = parser.pathname + parser.hash + parser.search
 
